@@ -50,6 +50,7 @@ public final class TelaCadastroTreino extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         campoCPFaluno = new javax.swing.JTextField();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -111,6 +112,14 @@ public final class TelaCadastroTreino extends javax.swing.JFrame {
             }
         });
 
+        jButton3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jButton3.setText("DELETAR");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,11 +129,6 @@ public final class TelaCadastroTreino extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(39, 39, 39)
                         .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(86, 86, 86)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -137,7 +141,13 @@ public final class TelaCadastroTreino extends javax.swing.JFrame {
                             .addComponent(DataInicio, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
                             .addComponent(DuracaoTreino, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
                             .addComponent(TipoTreino, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
-                            .addComponent(campoCPFaluno))))
+                            .addComponent(campoCPFaluno)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(86, 86, 86)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
@@ -182,7 +192,10 @@ public final class TelaCadastroTreino extends javax.swing.JFrame {
                         .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(33, 33, 33)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -249,15 +262,14 @@ public final class TelaCadastroTreino extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Selecione um treino para atualizar!");
             return;
         }
-            int idTreino = Integer.parseInt(((DefaultTableModel) tabelaTreino.getModel()).getValueAt(selectedRow, 0).toString());
-            String sql = "UPDATE treino SET id_aluno=?, tipo_treino=?, descricao=?, duracao_minutos=?, data_inicio=? WHERE id_treino=?";
+            String sql = "UPDATE treino SET id_aluno=?, tipo_treino=?, descricao=?, duracao_minutos=?, data_inicio=? WHERE id_aluno=?";
             try (PreparedStatement ps = TelaCadastroTreino.conn.prepareStatement(sql)) {
                 ps.setInt(1, idAluno);
                 ps.setString(2, TipoTreino.getText());
                 ps.setString(3, Descricao.getText());
                 ps.setInt(4, Integer.parseInt(DuracaoTreino.getText()));
                 ps.setDate(5, java.sql.Date.valueOf(LocalDate.parse(DataInicio.getText(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-                ps.setInt(6, idTreino);
+                ps.setInt(6, idAluno);
                 ps.executeUpdate();
             }
             atualizaTabelaTreino(campoCPFaluno.getText());
@@ -279,6 +291,42 @@ public final class TelaCadastroTreino extends javax.swing.JFrame {
 
     private void campoCPFalunoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_campoCPFalunoActionPerformed
     }//GEN-LAST:event_campoCPFalunoActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+
+        try {
+            if (campoCPFaluno.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "CPF é obrigatório!");
+                return;
+            }
+            String buscaIdSql = "SELECT * FROM aluno WHERE cpf_aluno = ?";
+            try (PreparedStatement selectPs = TelaCadastroA3.conn.prepareStatement(buscaIdSql)) {
+                selectPs.setString(1, campoCPFaluno.getText());
+                try (ResultSet rs = selectPs.executeQuery()) {
+                    if (!rs.next()) {
+                        JOptionPane.showMessageDialog(null, "Aluno não existe!");
+                        return;
+                    }
+                }
+            }
+            String deleteSql = "DELETE FROM treino WHERE tipo_treino = ?";
+            try (PreparedStatement deletePs = TelaCadastroTreino.conn.prepareStatement(deleteSql)) {
+                deletePs.setString(1, TipoTreino.getText());
+                deletePs.executeUpdate();
+            }
+            atualizaTabelaTreino(campoCPFaluno.getText());
+            campoCPFaluno.setText("");
+            TipoTreino.setText("");
+            DuracaoTreino.setText("");
+            DataInicio.setText("");
+            Descricao.setText("");
+            JOptionPane.showMessageDialog(null, "treino deletado com sucesso!");
+        } catch (HeadlessException | SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao deletar aluno: " + e.toString());
+            System.err.println("Erro: " + e.toString());
+        }
+
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     public void atualizaTabelaTreino(String cpf){
         try (PreparedStatement ps = TelaCadastroTreino.conn.prepareStatement(
@@ -311,6 +359,7 @@ public final class TelaCadastroTreino extends javax.swing.JFrame {
     private javax.swing.JTextField campoCPFaluno;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
