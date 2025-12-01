@@ -13,7 +13,7 @@ import java.sql.DriverManager;
 
 public final class TelaCadastroA3 extends javax.swing.JFrame {
 
-    private static Connection conn;
+    static Connection conn;
 
     static {
         try {
